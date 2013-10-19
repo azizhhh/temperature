@@ -48,7 +48,19 @@ public class Temperature {
       this.valueInKelvin = temperature.valueInKelvin;
       this.units = temperature.units;
   }
+  
+  /**Method that rounds to the nth decimal place
+   * 
+   */
+  public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
 
+	    long factor = (long) Math.pow(10, places);
+	    value = value * factor;
+	    long tmp = Math.round(value);
+	    return (double) tmp / factor;
+	}
+  
   /** Convert a {@code Temperature} value from  {@code Units} to Kelvin
    * @param value numerical value of Temperature
    */
@@ -61,7 +73,7 @@ public class Temperature {
                            break;
           case CELSIUS:    convertedValue = value + 273.15;
                            break;
-          case FAHRENHEIT: convertedValue = (value + 459.67) * 5.0/9.0;
+          case FAHRENHEIT: convertedValue = (value + 459.67) * Math.pow(1.8,-1);
                            break;
           default:         throw new IllegalArgumentException();
       }
@@ -80,7 +92,7 @@ public class Temperature {
                            break;
           case CELSIUS:    convertedValue = value - 273.15;
                            break;
-          case FAHRENHEIT: convertedValue = value * 9.0/5.0 - 459.67;
+          case FAHRENHEIT: convertedValue = round((value * 1.8 - 459.67), 6);
                            break;
           default:         throw new IllegalArgumentException();
       }
@@ -97,9 +109,9 @@ public class Temperature {
       switch (units) {
           case KELVIN:     formattedUnits = "K";
                            break;
-          case CELSIUS:    formattedUnits = "Â°C";
+          case CELSIUS:    formattedUnits = "¡C";
                            break;
-          case FAHRENHEIT: formattedUnits = "Â°F";
+          case FAHRENHEIT: formattedUnits = "¡F";
                            break;
           default:         throw new IllegalArgumentException();
       }
@@ -140,14 +152,37 @@ public class Temperature {
    * as follows
    * <pre><code>
    *    Temperature temperature = new Temperature(0, Temperature.Units.CELSIUS);
-   *    System.out.println(temperature.toString()); // prints "0Â Â°C"
+   *    System.out.println(temperature.toString()); // prints "0 ¡C"
    *    temperature.changeUnits(Temperature.Units.FAHRENHEIT);
-   *    System.out.println(temperature.toString()); // prints "32Â Â°F"
+   *    System.out.println(temperature.toString()); // prints "32 ¡F"
    *    temperature.changeUnits(Temperature.Units.KELVIN);
-   *    System.out.println(temperature.toString()); // prints "273.15Â K"
+   *    System.out.println(temperature.toString()); // prints "273.15 K"
    * </code></pre>
    */
   public String toString() {
     return getValue() + " " + unitsToString();
+  }
+  
+  public static void main(String args[]){
+	  
+	  Temperature averageHighInOctober = new Temperature (0, Temperature.Units.KELVIN);
+	  
+	  Temperature converted = new Temperature(averageHighInOctober);
+	  
+	  converted.changeUnits(Temperature.Units.CELSIUS);
+	  
+	  
+	  System.out.println(
+			  String.format(
+	                "The average temperature of Montreal in October 2012 was %s (%s)",
+	                averageHighInOctober.toString(),
+	                converted.toString()));
+	  
+	  Temperature temperature = new Temperature(-40, Temperature.Units.CELSIUS);
+	       System.out.println(temperature.toString()); // prints "0 ¡C"
+	       temperature.changeUnits(Temperature.Units.FAHRENHEIT);
+	       System.out.println(temperature.toString()); // prints "32 ¡F"
+	       temperature.changeUnits(Temperature.Units.KELVIN);
+	       System.out.println(temperature.toString()); // prints "273.15 K"
   }
 }
